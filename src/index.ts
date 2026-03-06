@@ -5,9 +5,10 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { FathomClient } from "./fathom-client.js";
 import { registerTools } from "./tools.js";
 
-const apiKey = process.env.FATHOM_API_KEY;
+const apiKeyFlagIndex = process.argv.indexOf("--api-key");
+const apiKey = (apiKeyFlagIndex !== -1 ? process.argv[apiKeyFlagIndex + 1] : undefined) ?? process.env.FATHOM_API_KEY;
 if (!apiKey) {
-  console.error("FATHOM_API_KEY environment variable is required");
+  console.error("Provide an API key via --api-key or FATHOM_API_KEY environment variable");
   process.exit(1);
 }
 

@@ -26,10 +26,10 @@ All list endpoints support cursor-based pagination.
 ### Quick start (via npx)
 
 ```bash
-claude mcp add fathom -- npx -y fathom-ai-mcp
+claude mcp add fathom -- npx -y fathom-ai-mcp --api-key your-api-key
 ```
 
-Then set your API key in `~/.claude.json`:
+Or using an environment variable:
 
 ```json
 {
