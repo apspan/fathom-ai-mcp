@@ -2,6 +2,8 @@
 
 An MCP (Model Context Protocol) server that exposes the [Fathom AI](https://fathom.ai) meeting intelligence API as tools for Claude. List meetings, fetch transcripts and summaries, and browse teams and members directly from Claude.
 
+> This is an unofficial community project, not affiliated with Fathom.
+
 ## Tools
 
 | Tool | Description |
@@ -21,7 +23,29 @@ All list endpoints support cursor-based pagination.
 - Node.js 18+
 - A Fathom AI API key (get one from your Fathom account settings)
 
-### Install and build
+### Quick start (via npx)
+
+```bash
+claude mcp add fathom -- npx -y fathom-ai-mcp
+```
+
+Then set your API key in `~/.claude.json`:
+
+```json
+{
+  "mcpServers": {
+    "fathom": {
+      "command": "npx",
+      "args": ["-y", "fathom-ai-mcp"],
+      "env": {
+        "FATHOM_API_KEY": "your-api-key"
+      }
+    }
+  }
+}
+```
+
+### Alternative: install from source
 
 ```bash
 git clone git@github.com:apspan/fathom-ai-mcp.git
@@ -30,9 +54,7 @@ npm install
 npm run build
 ```
 
-### Configure in Claude Code
-
-Add to `~/.claude.json` or your project's `.claude/settings.json`:
+Then configure with the absolute path:
 
 ```json
 {
@@ -48,33 +70,9 @@ Add to `~/.claude.json` or your project's `.claude/settings.json`:
 }
 ```
 
-### Configure in Claude Desktop
+### Claude Desktop
 
-Add to your `claude_desktop_config.json`:
-
-```json
-{
-  "mcpServers": {
-    "fathom": {
-      "command": "node",
-      "args": ["/absolute/path/to/fathom-ai-mcp/dist/index.js"],
-      "env": {
-        "FATHOM_API_KEY": "your-api-key"
-      }
-    }
-  }
-}
-```
-
-## Verify it works
-
-```bash
-echo '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test","version":"1.0.0"}}}
-{"jsonrpc":"2.0","method":"notifications/initialized","params":{}}
-{"jsonrpc":"2.0","id":2,"method":"tools/list","params":{}}' | FATHOM_API_KEY=test node dist/index.js
-```
-
-This should return the 5 tool definitions.
+Add the same config to your `claude_desktop_config.json` (either the npx or absolute path version).
 
 ## Usage examples
 
