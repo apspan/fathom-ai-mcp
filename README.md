@@ -20,32 +20,52 @@ All list endpoints support cursor-based pagination.
 
 ### Prerequisites
 
-- Node.js 18+
 - A Fathom AI API key (get one from your Fathom account settings)
+- Node.js 18+ (for local/stdio mode only — not needed for remote HTTP mode)
 
-### Quick start (via npx)
+### Option 1: Quick start via npx (Claude Code)
 
 ```bash
 claude mcp add fathom -- npx -y fathom-ai-mcp --api-key your-api-key
 ```
 
-Or using an environment variable:
+### Option 2: Remote HTTP server (Claude Desktop / Cowork)
+
+Deploy the server centrally (Docker/Kubernetes) so users don't need Node.js installed. Each user passes their own Fathom API key via the `X-Fathom-Api-Key` header.
+
+#### Run with Docker
+
+```bash
+docker build -t fathom-ai-mcp .
+docker run -p 3000:3000 fathom-ai-mcp
+```
+
+#### Configure in Claude Desktop
 
 ```json
 {
   "mcpServers": {
     "fathom": {
-      "command": "npx",
-      "args": ["-y", "fathom-ai-mcp"],
-      "env": {
-        "FATHOM_API_KEY": "your-api-key"
+      "url": "https://your-internal-host/mcp",
+      "headers": {
+        "X-Fathom-Api-Key": "your-api-key"
       }
     }
   }
 }
 ```
 
-### Alternative: install from source
+#### Server options
+
+```bash
+# Default: stdio mode
+fathom-ai-mcp --api-key your-key
+
+# HTTP mode on custom port
+fathom-ai-mcp --transport http --port 8080
+```
+
+### Option 3: Install from source
 
 ```bash
 git clone git@github.com:apspan/fathom-ai-mcp.git
@@ -70,10 +90,6 @@ Then configure with the absolute path:
 }
 ```
 
-### Claude Desktop
-
-Add the same config to your `claude_desktop_config.json` (either the npx or absolute path version).
-
 ## Usage examples
 
 Once configured, ask Claude things like:
@@ -85,4 +101,11 @@ Once configured, ask Claude things like:
 
 ## API reference
 
-This server wraps the [Fathom External API v1](https://developers.fathom.ai). Authentication uses the `X-Api-Key` header. The server will refuse to start if `FATHOM_API_KEY` is not set.
+This server wraps the [Fathom External API v1](https://developers.fathom.ai). Authentication uses the `X-Api-Key` header.
+
+### Transport modes
+
+| Mode | Flag | Auth | Use case |
+|------|------|------|----------|
+| stdio (default) | `--transport stdio` | `--api-key` or `FATHOM_API_KEY` env var | Claude Code, local development |
+| HTTP | `--transport http` | `X-Fathom-Api-Key` request header | Remote deployment, Claude Desktop, Cowork |
