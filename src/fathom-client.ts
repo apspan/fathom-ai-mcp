@@ -3,10 +3,12 @@ import type { ListMeetingsParams, ListTeamMembersParams } from "./types.js";
 const BASE_URL = "https://api.fathom.ai/external/v1";
 
 export class FathomClient {
-  private apiKey: string;
+  private credential: string;
+  private authMode: "api-key" | "bearer";
 
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
+  constructor(credential: string, authMode: "api-key" | "bearer" = "api-key") {
+    this.credential = credential;
+    this.authMode = authMode;
   }
 
   private async request(path: string, params?: URLSearchParams): Promise<unknown> {
@@ -15,12 +17,14 @@ export class FathomClient {
       url.search = params.toString();
     }
 
-    const response = await fetch(url.toString(), {
-      headers: {
-        "X-Api-Key": this.apiKey,
-        "Accept": "application/json",
-      },
-    });
+    const headers: Record<string, string> = { "Accept": "application/json" };
+    if (this.authMode === "bearer") {
+      headers["Authorization"] = `Bearer ${this.credential}`;
+    } else {
+      headers["X-Api-Key"] = this.credential;
+    }
+
+    const response = await fetch(url.toString(), { headers });
 
     if (!response.ok) {
       const body = await response.text();
